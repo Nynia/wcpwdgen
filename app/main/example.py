@@ -58,7 +58,7 @@ def wechat_auth():
 
             print([keyword, account, mode])
             keywords_response = get_all_keywords()
-            print(keywords_response.content)
+            print(keywords_response.data)
             #match = search_best_match(keyword, keywords)
             #print(match)
 
