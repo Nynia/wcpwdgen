@@ -185,6 +185,7 @@ def naive_string_match(T, P, idx=-1):
 
 
 def search_best_match(w1, keywords):
+    keywords = keywords['data']
     result = []
     for k in keywords:
         w2 = k.keyword
