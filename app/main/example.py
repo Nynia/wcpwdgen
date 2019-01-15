@@ -35,7 +35,6 @@ def wechat_auth():
         print(str)
         hashlib.sha1(str).hexdigest()
 
-
         if hashlib.sha1(str).hexdigest() == signature:
             return make_response(echostr)
     else:
