@@ -59,6 +59,7 @@ def wechat_auth():
             print([keyword, account, mode])
             keywords = get_all_keywords()
             match = search_best_match(keyword, keywords)
+            print(match)
 
         print(sumof(fromuser + touser))
         password = gen_password(hashlib.sha1(content + touser).hexdigest(), sumof(fromuser))

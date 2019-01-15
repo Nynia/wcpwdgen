@@ -34,7 +34,7 @@ def add_keyword():
         item = Keyword()
         item.keyword = keyword
         item.createtime = datetime.datetime.now()
-        item.createtime = item.createtime
+        item.modifytime = item.createtime
 
         db.session.add(item)
         db.session.commit()
