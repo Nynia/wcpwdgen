@@ -6,7 +6,8 @@ import hashlib
 import time
 import urllib.request
 import urllib.parse
-from config import TOKEN, APPID, APPSECRET
+from config import TOKEN
+from app.api.keyword import *
 
 
 @main.route('/test', methods=['GET'])
@@ -27,12 +28,10 @@ def wechat_auth():
         timestamp = request.args.get('timestamp', '')
         nonce = request.args.get('nonce', '')
         echostr = request.args.get('echostr', '')
-
         str = [timestamp, nonce, token]
         print(str)
         str.sort()
         str = ''.join(str)
-        print(str)
         hashlib.sha1(str).hexdigest()
 
         if hashlib.sha1(str).hexdigest() == signature:
@@ -42,8 +41,24 @@ def wechat_auth():
         xml_rec = ET.fromstring(rec)
         touser = xml_rec.find('ToUserName').text
         fromuser = xml_rec.find('FromUserName').text
-        content = xml_rec.find('Content').text
+        content = xml_rec.find('Content').text.strip()
         print([touser, fromuser, content])
+
+        if content == 'help':
+            pass
+        elif content == 'list':
+            pass
+        elif content == 'history':
+            pass
+        else:
+            content_splited = content.split(' ')
+            keyword = content_splited[0]
+            account = content_splited[1] if len(content_splited) > 1 else ''
+            mode = content_splited[2] if len(content_splited) > 2 else ''
+
+            print([keyword, account, mode])
+            keywords = get_all_keywords()
+            match = search_best_match(keyword, keywords)
 
         print(sumof(fromuser + touser))
         password = gen_password(hashlib.sha1(content + touser).hexdigest(), sumof(fromuser))
@@ -149,4 +164,32 @@ def sumof(str):
     result = 0
     for i in str:
         result += ord(i)
+    return result
+
+
+def naive_string_match(T, P, idx=-1):
+    n = len(T)
+    m = len(P)
+
+    for s in range(0, n - m + 1):
+        k = 0
+        for i in range(0, m):
+            if T[s + i] != P[i] and idx != i:
+                break
+            else:
+                k += 1
+        if k == m:
+            return s
+    return -1
+
+
+def search_best_match(w1, keywords):
+    result = []
+    for k in keywords:
+        w2 = k.keyword
+        if naive_string_match(w1, w2) >= 0:
+            return [k]
+        for i in range(1, len(w2) - 1):
+            if naive_string_match(w1, w2, i) >= 0:
+                result.append(k)
     return result
