@@ -57,10 +57,10 @@ def wechat_auth():
             mode = content_splited[2] if len(content_splited) > 2 else ''
 
             print([keyword, account, mode])
-            keywords = get_all_keywords()
-            print(keywords)
-            match = search_best_match(keyword, keywords)
-            print(match)
+            keywords_response = get_all_keywords()
+            print(keywords_response.content)
+            #match = search_best_match(keyword, keywords)
+            #print(match)
 
         print(sumof(fromuser + touser))
         password = gen_password(hashlib.sha1(content + touser).hexdigest(), sumof(fromuser))
