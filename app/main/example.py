@@ -8,7 +8,7 @@ import urllib.request
 import urllib.parse
 from config import TOKEN
 from app.api.keyword import *
-
+import json
 
 @main.route('/test', methods=['GET'])
 def test():
@@ -28,13 +28,13 @@ def wechat_auth():
         timestamp = request.args.get('timestamp', '')
         nonce = request.args.get('nonce', '')
         echostr = request.args.get('echostr', '')
-        str = [timestamp, nonce, token]
-        print(str)
-        str.sort()
-        str = ''.join(str)
-        hashlib.sha1(str).hexdigest()
+        payload = [timestamp, nonce, token]
+        print(payload)
+        payload.sort()
+        payload = ''.join(payload)
+        hashlib.sha1(payload).hexdigest()
 
-        if hashlib.sha1(str).hexdigest() == signature:
+        if hashlib.sha1(payload).hexdigest() == signature:
             return make_response(echostr)
     else:
         rec = request.stream.read()
@@ -58,9 +58,9 @@ def wechat_auth():
 
             print([keyword, account, mode])
             keywords_response = get_all_keywords()
-            print(keywords_response.data)
-            #match = search_best_match(keyword, keywords)
-            #print(match)
+            json_rsp = (json.loads(str(keywords_response, encoding="utf-8")))
+            match = search_best_match(keyword, json_rsp)
+            print(match)
 
         print(sumof(fromuser + touser))
         password = gen_password(hashlib.sha1(content + touser).hexdigest(), sumof(fromuser))
@@ -185,10 +185,9 @@ def naive_string_match(T, P, idx=-1):
     return -1
 
 
-def search_best_match(w1, keywords):
-    keywords = keywords['data']
+def search_best_match(w1, rsp):
     result = []
-    for k in keywords:
+    for k in rsp['data']:
         w2 = k.keyword
         if naive_string_match(w1, w2) >= 0:
             return [k]
