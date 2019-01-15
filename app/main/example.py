@@ -39,6 +39,7 @@ def wechat_auth():
     else:
         rec = request.stream.read()
         xml_rec = ET.fromstring(rec)
+
         touser = xml_rec.find('ToUserName').text
         fromuser = xml_rec.find('FromUserName').text
         content = xml_rec.find('Content').text.strip()
