@@ -188,7 +188,8 @@ def naive_string_match(T, P, idx=-1):
 def search_best_match(w1, rsp):
     result = []
     for k in rsp['data']:
-        w2 = k.keyword
+        print(k)
+        w2 = k['keyword']
         if naive_string_match(w1, w2) >= 0:
             return [k]
         for i in range(1, len(w2) - 1):
