@@ -61,7 +61,7 @@ def wechat_auth():
             keywords_response = get_all_keywords()
             json_rsp = (json.loads(str(keywords_response.data, encoding="utf-8")))
             match = search_best_match(keyword, json_rsp)
-            print(match[0]['keyword'])
+            print(match)
 
         print(sumof(fromuser + touser))
         password = gen_password(hashlib.sha1((content + touser).encode('utf-8')).hexdigest(), sumof(fromuser))
