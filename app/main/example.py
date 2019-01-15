@@ -58,7 +58,7 @@ def wechat_auth():
 
             print([keyword, account, mode])
             keywords_response = get_all_keywords()
-            json_rsp = (json.loads(str(keywords_response, encoding="utf-8")))
+            json_rsp = (json.loads(str(keywords_response.data, encoding="utf-8")))
             match = search_best_match(keyword, json_rsp)
             print(match)
 
