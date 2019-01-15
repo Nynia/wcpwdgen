@@ -34,7 +34,7 @@ def wechat_auth():
         payload = ''.join(payload)
         hashlib.sha1(payload).hexdigest()
 
-        if hashlib.sha1(payload).hexdigest() == signature:
+        if hashlib.sha1(payload.encode('utf-8')).hexdigest() == signature:
             return make_response(echostr)
     else:
         rec = request.stream.read()
@@ -63,7 +63,7 @@ def wechat_auth():
             print(match)
 
         print(sumof(fromuser + touser))
-        password = gen_password(hashlib.sha1(content + touser).hexdigest(), sumof(fromuser))
+        password = gen_password(hashlib.sha1((content + touser).encode('utf-8')).hexdigest(), sumof(fromuser))
         print(password)
         xml_rep = '''<xml>
             <ToUserName><![CDATA[%s]]></ToUserName>
