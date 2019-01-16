@@ -195,10 +195,14 @@ def naive_string_match(T, P, idx=-1):
 def search_best_match(rsp, w2):
     result = (-1, [])
     for k in rsp['data']:
-        print(k)
         w1 = k['keyword']
         if naive_string_match(w1, w2) >= 0:
-            return 0, w1
+            if result[0] == 0:
+                result[1].append(w1)
+            else:
+                result = (0, [w1])
+        if result[0] == 0:
+            continue
         for i in range(1, len(w2) - 1):
             if naive_string_match(w1, w2, i) >= 0:
                 if result[0] == -1:
