@@ -70,7 +70,7 @@ def wechat_auth():
                 mode = content_splited[2]
             elif len(content_splited) > 1:
                 if content_splited[1].isnumeric():
-                    mode = content_splited[2]
+                    mode = content_splited[1]
                     account = None
                 else:
                     account = content_splited[1]
