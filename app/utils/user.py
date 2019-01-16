@@ -18,7 +18,6 @@ def add_new_user(openid, email):
 
     db.session.add(item)
     db.session.commit()
-
     return True
 
 
