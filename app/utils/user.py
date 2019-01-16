@@ -24,6 +24,8 @@ def add_new_user(openid, email):
 
 def update_user(openid, email):
     item = User.query.get(openid)
+    if item.email1 == email or item.email2 == email or item.email3 == email:
+        return False
     if not item.email2:
         item.email2 = email
     elif not item.email3:
