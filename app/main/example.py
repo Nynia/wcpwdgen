@@ -76,15 +76,15 @@ def wechat_auth():
             if match[0] == 0:
                 # 数据库有完全匹配的记录
                 if len(match[1]) == 1:
-                    restr = match[1][0]['keyword'] + '--' + password
+                    restr = match[1][0] + '--' + password
                 else:
                     for i in range(len(match[1])):
-                        restr += (str(i) + '-' + match[1][i]['keyword'] + '\n')
+                        restr += str(i) + '-' + match[1][i] + '\n'
 
             elif match[0] == 1:
                 # 数据库有不完全匹配的记录
                 for i in range(len(match[1])):
-                    restr += str(i) + '-' + match[1][i]['keyword'] + '\n'
+                    restr += str(i) + '-' + match[1][i] + '\n'
             else:
                 # 首次出现
                 restr = keyword + '--' + password
