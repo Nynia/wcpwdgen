@@ -27,7 +27,7 @@ def add_rel(openid, keyword, account='', mode=604):
         return False
 
 
-def update_rel(openid, keyword, account, mode=604):
+def update_rel(openid, keyword, account, mode):
     item = Master.query.filter_by(openid=openid).filter_by(keyword=keyword). \
         filter_by(account=account).first()
     if not item:
@@ -35,7 +35,7 @@ def update_rel(openid, keyword, account, mode=604):
         item.openid = openid
         item.keyword = keyword
         item.account = account
-        item.mode = mode
+        item.mode = 604
         item.createtime = datetime.datetime.now()
         item.modifytime = item.createtime
 

@@ -63,13 +63,13 @@ def wechat_auth():
         else:
             content_splited = content.split(' ')
             keyword = content_splited[0]
-            account = content_splited[1] if len(content_splited) > 1 else ''
-            mode = content_splited[2] if len(content_splited) > 2 else ''
+            account = content_splited[1] if len(content_splited) > 1 else None
+            mode = content_splited[2] if len(content_splited) > 2 else None
             if keyword.startswith('http://'):
                 keyword = keyword[7:]
             print([keyword, account, mode])
 
-            if account == '' or mode == '':
+            if not account or not mode:
                 items = get_rel_by_openid(fromuser)
                 if len(items) > 0:
                     account = items[0].account
