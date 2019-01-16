@@ -9,6 +9,8 @@ from config import TOKEN
 import json
 from app.utils.keyword import get_all_keywords, add_keyword
 from app.utils.master import get_rel_by_openid, update_rel
+import re
+
 
 @main.route('/test', methods=['GET'])
 def test():
@@ -63,8 +65,19 @@ def wechat_auth():
         else:
             content_splited = content.split(' ')
             keyword = content_splited[0]
-            account = content_splited[1] if len(content_splited) > 1 else None
-            mode = content_splited[2] if len(content_splited) > 2 else None
+            if len(content_splited) > 2:
+                account = content_splited[1]
+                mode = content_splited[2]
+            elif len(content_splited) > 1:
+                if content_splited[1].isnumeric():
+                    mode = content_splited[2]
+                    account = None
+                else:
+                    account = content_splited[1]
+                    mode = None
+            else:
+                account = None
+                mode = None
             if keyword.startswith('http://'):
                 keyword = keyword[7:]
             print([keyword, account, mode])
