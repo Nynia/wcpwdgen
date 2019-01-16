@@ -66,7 +66,10 @@ def wechat_auth():
             if len(content_splited) > 2:
                 email = content_splited[2]
                 add_new_user(fromuser, email)
-
+            restr = "email设置成功"
+            response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
+            response.content_type = 'application/xml'
+            return response
         else:
             content_splited = content.split(' ')
             keyword = content_splited[0]
