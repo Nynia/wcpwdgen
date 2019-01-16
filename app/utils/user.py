@@ -9,12 +9,15 @@ def get_user_by_openid(openid):
 
 
 def add_new_user(openid, email):
-    item = User()
-    item.openid = openid
-    item.email1 = email
-
-    item.createtime = datetime.datetime.now()
-    item.modifytime = item.createtime
+    item = User.query.get(openid)
+    if item:
+        item.email1 = email
+    else:
+        item = User()
+        item.openid = openid
+        item.email1 = email
+        item.createtime = datetime.datetime.now()
+    item.modifytime = datetime.datetime.now()
 
     db.session.add(item)
     db.session.commit()
