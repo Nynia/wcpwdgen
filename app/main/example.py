@@ -45,6 +45,15 @@ def wechat_auth():
         content = xml_rec.find('Content').text.strip()
         print([touser, fromuser, content])
 
+        xml_rep = '''<xml>
+                    <ToUserName><![CDATA[%s]]></ToUserName>
+                    <FromUserName><![CDATA[%s]]></FromUserName>
+                    <CreateTime>%s</CreateTime>
+                    <MsgType><![CDATA[text]]></MsgType>
+                    <Content><![CDATA[%s]]></Content>
+                    <FuncFlag>0</FuncFlag>
+                    </xml>
+                '''
         if content == 'help':
             pass
         elif content == 'list':
@@ -63,18 +72,15 @@ def wechat_auth():
             match = search_best_match(json_rsp, keyword)
             print(match)
 
+            # response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), password))
+            # response.content_type = 'application/xml'
+            # return response
+
+
         print(sumof(fromuser + touser))
         password = gen_password(hashlib.sha1((content + touser).encode('utf-8')).hexdigest(), sumof(fromuser))
         print(password)
-        xml_rep = '''<xml>
-            <ToUserName><![CDATA[%s]]></ToUserName>
-            <FromUserName><![CDATA[%s]]></FromUserName>
-            <CreateTime>%s</CreateTime>
-            <MsgType><![CDATA[text]]></MsgType>
-            <Content><![CDATA[%s]]></Content>
-            <FuncFlag>0</FuncFlag>
-            </xml>
-        '''
+
         response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), password))
         response.content_type = 'application/xml'
         return response
@@ -186,14 +192,17 @@ def naive_string_match(T, P, idx=-1):
     return -1
 
 
-def search_best_match(rsp, w1):
-    result = []
+def search_best_match(rsp, w2):
+    result = (-1, [])
     for k in rsp['data']:
         print(k)
-        w2 = k['keyword']
-        if naive_string_match(w2, w2) >= 0:
-            return [k]
+        w1 = k['keyword']
+        if naive_string_match(w1, w2) >= 0:
+            return 0, w1
         for i in range(1, len(w2) - 1):
             if naive_string_match(w1, w2, i) >= 0:
-                result.append(k)
+                if result[0] == -1:
+                    result = (1, [w1])
+                else:
+                    result[1].append(w1)
     return result
