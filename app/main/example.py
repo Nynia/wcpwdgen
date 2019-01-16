@@ -216,8 +216,8 @@ def naive_string_match(T, P, idx=-1):
 def search_best_match(rsp, w2):
     result = (-1, [])
     if '.' not in w2:
-        for k in rsp['data']:
-            w1 = k['keyword']
+        for k in rsp:
+            w1 = k.keyword
             if naive_string_match(w1, w2) >= 0:
                 if result[0] == 0:
                     result[1].append(w1)
@@ -232,8 +232,8 @@ def search_best_match(rsp, w2):
                     else:
                         result[1].append(w1)
     else:
-        for k in rsp['data']:
-            w1 = k['keyword']
+        for k in rsp:
+            w1 = k.keyword
             if naive_string_match(w1, w2) == 0:
                 return 0, [w1]
             for i in range(1, len(w2)):
@@ -241,8 +241,8 @@ def search_best_match(rsp, w2):
                     return 1, [w1]
     if result[0] == -1:
         # 搜索标签
-        for k in rsp['data']:
-            l1 = k['label1']
+        for k in rsp:
+            l1 = k.label1
             if not l1:
                 continue
             if naive_string_match(l1, w2) == 0:
