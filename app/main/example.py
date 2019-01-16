@@ -82,11 +82,11 @@ def wechat_auth():
                 keyword = keyword[7:]
             print([keyword, account, mode])
 
-            if not account or not mode:
-                items = get_rel_by_openid(fromuser)
-                if len(items) > 0:
-                    account = items[0].account
-                    mode = items[0].mode
+            # if not account or not mode:
+            #     items = get_rel_by_openid(fromuser)
+            #     if len(items) > 0:
+            #         account = items[0].account
+            #         mode = items[0].mode
 
             keywords = get_all_keywords()
             match = search_best_match(keywords, keyword)
