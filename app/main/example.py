@@ -93,6 +93,7 @@ def wechat_auth():
                 restr = keyword + '----' + password
                 # keyword 添加到数据库
 
+
             response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
             response.content_type = 'application/xml'
             return response
