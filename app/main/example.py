@@ -90,6 +90,15 @@ def wechat_auth():
                 keyword = keyword[7:]
             print([keyword, account, mode])
 
+            if not account:
+                item = get_user_by_openid(fromuser)
+                if not item:
+                    restr = "请先初始化默认账户 set email xxx@xxx.xx"
+                    response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
+                    response.content_type = 'application/xml'
+                    return response
+                else:
+                    account = item.email1
             if not mode:
                 item = get_rel(fromuser, keyword, account)
                 if item:
@@ -120,6 +129,7 @@ def wechat_auth():
 
             # update rel
             update_rel(fromuser, keyword, account, mode)
+            update_user(fromuser, account)
 
             response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
             response.content_type = 'application/xml'
