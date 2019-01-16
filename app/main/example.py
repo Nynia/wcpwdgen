@@ -60,7 +60,7 @@ def wechat_auth():
             print([keyword, account, mode])
             keywords_response = get_all_keywords()
             json_rsp = (json.loads(str(keywords_response.data, encoding="utf-8")))
-            match = search_best_match(keyword, json_rsp)
+            match = search_best_match(json_rsp, keyword)
             print(match)
 
         print(sumof(fromuser + touser))
@@ -186,12 +186,12 @@ def naive_string_match(T, P, idx=-1):
     return -1
 
 
-def search_best_match(w1, rsp):
+def search_best_match(rsp, w1):
     result = []
     for k in rsp['data']:
         print(k)
         w2 = k['keyword']
-        if naive_string_match(w1, w2) >= 0:
+        if naive_string_match(w2, w2) >= 0:
             return [k]
         for i in range(1, len(w2) - 1):
             if naive_string_match(w1, w2, i) >= 0:
