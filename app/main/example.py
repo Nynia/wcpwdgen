@@ -1,6 +1,5 @@
 from . import main
 from flask import jsonify, request, make_response
-import json
 import xml.etree.ElementTree as ET
 import hashlib
 import time
@@ -9,6 +8,7 @@ import urllib.parse
 from config import TOKEN
 from app.api.keyword import *
 import json
+
 
 @main.route('/test', methods=['GET'])
 def test():
