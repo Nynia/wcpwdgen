@@ -45,6 +45,7 @@ def wechat_auth():
         content = xml_rec.find('Content').text.strip()
         print([touser, fromuser, content])
 
+        password = gen_password(hashlib.sha1((content + touser).encode('utf-8')).hexdigest(), sumof(fromuser))
         xml_rep = '''<xml>
                     <ToUserName><![CDATA[%s]]></ToUserName>
                     <FromUserName><![CDATA[%s]]></FromUserName>
@@ -54,6 +55,7 @@ def wechat_auth():
                     <FuncFlag>0</FuncFlag>
                     </xml>
                 '''
+        restr = ''
         if content == 'help':
             pass
         elif content == 'list':
@@ -70,20 +72,34 @@ def wechat_auth():
             keywords_response = get_all_keywords()
             json_rsp = (json.loads(str(keywords_response.data, encoding="utf-8")))
             match = search_best_match(json_rsp, keyword)
-            print(match)
+            if match[0] == 0:
+                # 数据库有完全匹配的记录
+                if len(match[1]) == 1:
+                    restr = match[1][0]['keyword'] + '--' + password
+                else:
+                    for i in range(len(match[1])):
+                        restr += '%d-' + match[1][i]['keyword'] + '\n'
 
-            # response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), password))
-            # response.content_type = 'application/xml'
-            # return response
+            elif match[0] == 1:
+                # 数据库有不完全匹配的记录
+                for i in range(len(match[1])):
+                    restr += '%d-' + match[1][i]['keyword'] + '\n'
+            else:
+                # 首次出现
+                restr = keyword + '--' + password
+                # keyword 添加到数据库
 
+            response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
+            response.content_type = 'application/xml'
+            return response
 
-        print(sumof(fromuser + touser))
-        password = gen_password(hashlib.sha1((content + touser).encode('utf-8')).hexdigest(), sumof(fromuser))
-        print(password)
+        # print(sumof(fromuser + touser))
 
-        response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), password))
-        response.content_type = 'application/xml'
-        return response
+        # print(password)
+        #
+        # response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), password))
+        # response.content_type = 'application/xml'
+        # return response
 
 
 def get_access_token():
@@ -203,7 +219,7 @@ def search_best_match(rsp, w2):
                 result = (0, [w1])
         if result[0] == 0:
             continue
-        for i in range(1, len(w2) - 1):
+        for i in range(1, len(w2)):
             if naive_string_match(w1, w2, i) >= 0:
                 if result[0] == -1:
                     result = (1, [w1])
