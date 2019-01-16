@@ -8,7 +8,7 @@ import urllib.parse
 from config import TOKEN
 import json
 from app.utils.keyword import get_all_keywords, add_keyword
-
+from app.utils.master import get_rel_by_openid, update_rel
 
 @main.route('/test', methods=['GET'])
 def test():
@@ -60,20 +60,22 @@ def wechat_auth():
             pass
         elif content == 'list':
             pass
-        elif content == 'history':
-            pass
         else:
             content_splited = content.split(' ')
             keyword = content_splited[0]
             account = content_splited[1] if len(content_splited) > 1 else ''
             mode = content_splited[2] if len(content_splited) > 2 else ''
-
             if keyword.startswith('http://'):
                 keyword = keyword[7:]
-
             print([keyword, account, mode])
+
+            if account == '' or mode == '':
+                items = get_rel_by_openid(fromuser)
+                if len(items) > 0:
+                    account = items[0].account
+                    mode = items[0].mode
+
             keywords = get_all_keywords()
-            print(keywords)
             match = search_best_match(keywords, keyword)
             print(match)
             if match[0] == 0:
@@ -91,9 +93,11 @@ def wechat_auth():
             else:
                 # 首次出现
                 restr = keyword + '----' + password
-                # keyword 添加到数据库
+                # update数据库
                 add_keyword(keyword)
 
+            # update rel
+            update_rel(fromuser, keyword, account, mode)
 
             response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
             response.content_type = 'application/xml'
