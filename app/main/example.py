@@ -8,9 +8,8 @@ import urllib.parse
 from config import TOKEN
 import json
 from app.utils.keyword import get_all_keywords, add_keyword
-from app.utils.master import get_rel_by_openid, update_rel
-import re
-
+from app.utils.master import update_rel, get_rel
+from app.utils.user import *
 
 @main.route('/test', methods=['GET'])
 def test():
@@ -62,6 +61,12 @@ def wechat_auth():
             pass
         elif content == 'list':
             pass
+        elif content.startswith('set email'):
+            content_splited = content.split(' ')
+            if len(content_splited) > 2:
+                email = content_splited[2]
+                add_new_user(fromuser, email)
+
         else:
             content_splited = content.split(' ')
             keyword = content_splited[0]
@@ -82,11 +87,12 @@ def wechat_auth():
                 keyword = keyword[7:]
             print([keyword, account, mode])
 
-            # if not account or not mode:
-            #     items = get_rel_by_openid(fromuser)
-            #     if len(items) > 0:
-            #         account = items[0].account
-            #         mode = items[0].mode
+            if not mode:
+                item = get_rel(fromuser, keyword, account)
+                if item:
+                    mode = item.mode
+                else:
+                    mode = 604
 
             keywords = get_all_keywords()
             match = search_best_match(keywords, keyword)

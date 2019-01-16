@@ -4,14 +4,20 @@ from app import db
 class User(db.Model):
     __tablename__ = 'user'
     openid = db.Column(db.VARCHAR(50), primary_key=True)
-    mode = db.Column(db.INTEGER)
+    email1 = db.Column(db.VARCHAR(50))
+    email2 = db.Column(db.VARCHAR(50))
+    email3 = db.Column(db.VARCHAR(50))
     createtime = db.Column(db.DATETIME)
+    modifytime = db.Column(db.DATETIME)
 
     def to_json(self):
         return {
             'openid': self.openid,
-            'mode': self.mode,
-            'createtime': self.createtime
+            'email1': self.email1,
+            'email2': self.email2,
+            'email3': self.email3,
+            'createtime': self.createtime,
+            'modifytime': self.modifytime
         }
 
     def __repr__(self):

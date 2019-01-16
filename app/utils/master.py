@@ -8,23 +8,10 @@ def get_rel_by_openid(openid):
     return items
 
 
-def add_rel(openid, keyword, account='', mode=604):
+def get_rel(openid, keyword, account):
     item = Master.query.filter_by(openid=openid).filter_by(keyword=keyword). \
         filter_by(account=account).first()
-    if item is None:
-        item.keyword = keyword
-        item.account = account
-        item.mode = mode
-
-        item.createtime = datetime.datetime.now()
-        item.modifytime = item.createtime
-
-        db.session.add(item)
-        db.session.commit()
-
-        return True
-    else:
-        return False
+    return item
 
 
 def update_rel(openid, keyword, account, mode):
