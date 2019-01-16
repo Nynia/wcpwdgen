@@ -92,6 +92,7 @@ def wechat_auth():
                 # 首次出现
                 restr = keyword + '----' + password
                 # keyword 添加到数据库
+                add_keyword(keyword)
 
 
             response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
