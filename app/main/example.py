@@ -72,18 +72,19 @@ def wechat_auth():
             keywords_response = get_all_keywords()
             json_rsp = (json.loads(str(keywords_response.data, encoding="utf-8")))
             match = search_best_match(json_rsp, keyword)
+            print(match)
             if match[0] == 0:
                 # 数据库有完全匹配的记录
                 if len(match[1]) == 1:
                     restr = match[1][0]['keyword'] + '--' + password
                 else:
                     for i in range(len(match[1])):
-                        restr += str(i) + '-' + match[1][i]['keyword'] + '\n'
+                        restr += (str(i) + '-' + match[1][i]['keyword'] + '\n')
 
             elif match[0] == 1:
                 # 数据库有不完全匹配的记录
                 for i in range(len(match[1])):
-                    restr += str(i) + '-'  + match[1][i]['keyword'] + '\n'
+                    restr += str(i) + '-' + match[1][i]['keyword'] + '\n'
             else:
                 # 首次出现
                 restr = keyword + '--' + password
