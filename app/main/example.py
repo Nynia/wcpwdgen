@@ -238,4 +238,16 @@ def search_best_match(rsp, w2):
             for i in range(1, len(w2)):
                 if naive_string_match(w1, w2, i) == 0:
                     return 1, [w1]
+    if result[0] == -1:
+        # 搜索标签
+        for k in rsp['data']:
+            l1 = k['label1']
+            if not l1:
+                continue
+            if naive_string_match(l1, w2) == 0:
+                return 0, [k['keyword']]
+            for i in range(1, len(w2)):
+                if naive_string_match(l1, w2, i) == 0:
+                    return 1, [k['keyword']]
+
     return result
