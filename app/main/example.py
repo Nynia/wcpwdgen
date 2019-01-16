@@ -7,7 +7,7 @@ import urllib.request
 import urllib.parse
 from config import TOKEN
 import json
-from app.utils import keyword as KW
+from app.utils.keyword import get_all_keywords, add_keyword
 
 
 @main.route('/test', methods=['GET'])
@@ -72,7 +72,7 @@ def wechat_auth():
                 keyword = keyword[7:]
 
             print([keyword, account, mode])
-            keywords = KW.get_all_keywords()
+            keywords = get_all_keywords()
             print(keywords)
             match = search_best_match(keywords, keyword)
             print(match)
