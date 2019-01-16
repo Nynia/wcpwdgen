@@ -68,6 +68,9 @@ def wechat_auth():
             account = content_splited[1] if len(content_splited) > 1 else ''
             mode = content_splited[2] if len(content_splited) > 2 else ''
 
+            if keyword.startswith('http://'):
+                keyword = keyword[7:]
+
             print([keyword, account, mode])
             keywords_response = get_all_keywords()
             json_rsp = (json.loads(str(keywords_response.data, encoding="utf-8")))
@@ -76,18 +79,18 @@ def wechat_auth():
             if match[0] == 0:
                 # 数据库有完全匹配的记录
                 if len(match[1]) == 1:
-                    restr = match[1][0] + '--' + password
+                    restr = match[1][0] + '----' + password
                 else:
                     for i in range(len(match[1])):
-                        restr += str(i) + '-' + match[1][i] + '\n'
+                        restr += match[1][i] + '\n'
 
             elif match[0] == 1:
                 # 数据库有不完全匹配的记录
                 for i in range(len(match[1])):
-                    restr += str(i) + '-' + match[1][i] + '\n'
+                    restr += match[1][i] + '\n'
             else:
                 # 首次出现
-                restr = keyword + '--' + password
+                restr = keyword + '----' + password
                 # keyword 添加到数据库
 
             response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
@@ -211,19 +214,28 @@ def naive_string_match(T, P, idx=-1):
 
 def search_best_match(rsp, w2):
     result = (-1, [])
-    for k in rsp['data']:
-        w1 = k['keyword']
-        if naive_string_match(w1, w2) >= 0:
-            if result[0] == 0:
-                result[1].append(w1)
-            else:
-                result = (0, [w1])
-        if result[0] == 0:
-            continue
-        for i in range(1, len(w2)):
-            if naive_string_match(w1, w2, i) >= 0:
-                if result[0] == -1:
-                    result = (1, [w1])
-                else:
+    if '.' not in w2:
+        for k in rsp['data']:
+            w1 = k['keyword']
+            if naive_string_match(w1, w2) >= 0:
+                if result[0] == 0:
                     result[1].append(w1)
+                else:
+                    result = (0, [w1])
+            if result[0] == 0:
+                continue
+            for i in range(1, len(w2)):
+                if naive_string_match(w1, w2, i) >= 0:
+                    if result[0] == -1:
+                        result = (1, [w1])
+                    else:
+                        result[1].append(w1)
+    else:
+        for k in rsp['data']:
+            w1 = k['keyword']
+            if naive_string_match(w1, w2) == 0:
+                return 0, [w1]
+            for i in range(1, len(w2)):
+                if naive_string_match(w1, w2, i) == 0:
+                    return 1, [w1]
     return result
