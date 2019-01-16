@@ -6,8 +6,8 @@ import time
 import urllib.request
 import urllib.parse
 from config import TOKEN
-from app.api.keyword import *
 import json
+from app.utils import keyword as Keyword
 
 
 @main.route('/test', methods=['GET'])
@@ -72,9 +72,9 @@ def wechat_auth():
                 keyword = keyword[7:]
 
             print([keyword, account, mode])
-            keywords_response = get_all_keywords()
-            json_rsp = (json.loads(str(keywords_response.data, encoding="utf-8")))
-            match = search_best_match(json_rsp, keyword)
+            keywords = Keyword.get_all_keywords()
+            print(keywords)
+            match = search_best_match(keywords, keyword)
             print(match)
             if match[0] == 0:
                 # 数据库有完全匹配的记录
