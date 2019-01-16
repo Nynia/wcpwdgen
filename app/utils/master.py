@@ -30,6 +30,8 @@ def add_rel(openid, keyword, account='', mode=604):
 def update_rel(openid, keyword, account, mode):
     item = Master.query.filter_by(openid=openid).filter_by(keyword=keyword). \
         filter_by(account=account).first()
+    print(openid, keyword, account, mode)
+    print(item)
     if not item:
         item = Master()
         item.openid = openid
