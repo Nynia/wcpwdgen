@@ -379,9 +379,9 @@ def search_best_match(rsp, w2):
             if not l1:
                 continue
             if naive_string_match(l1, w2) == 0:
-                return 0, [k['keyword']]
+                return 0, [k.keyword]
             for i in range(1, len(w2)):
                 if naive_string_match(l1, w2, i) == 0:
-                    return 1, [k['keyword']]
+                    return 1, [k.keyword]
 
     return result
