@@ -115,7 +115,7 @@ def wechat_auth():
             if match[0] == 0:
                 # 数据库有完全匹配的记录
                 if len(match[1]) == 1:
-                    restr = match[1][0] + '----' + gen_password2(match[1][0]+account+fromuser, mode)
+                    restr = match[1][0] + '----' + gen_password2(match[1][0]+account+fromuser, int(mode))
                 else:
                     for i in range(len(match[1])):
                         restr += match[1][i] + '\n'
@@ -126,7 +126,7 @@ def wechat_auth():
                     restr += match[1][i] + '\n'
             else:
                 # 首次出现
-                restr = keyword + '----' + gen_password2(keyword+account+fromuser, mode)
+                restr = keyword + '----' + gen_password2(keyword+account+fromuser, int(mode))
                 # update数据库
                 add_keyword(keyword)
 
