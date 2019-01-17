@@ -374,6 +374,7 @@ def search_best_match(rsp, w2):
     if result[0] == -1:
         # 搜索标签
         for k in rsp:
+            print(k)
             l1 = k.label1
             if not l1:
                 continue
