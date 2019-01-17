@@ -10,6 +10,9 @@ import json
 from app.utils.keyword import get_all_keywords, add_keyword
 from app.utils.master import update_rel, get_rel
 from app.utils.user import *
+import string
+import math
+
 
 @main.route('/test', methods=['GET'])
 def test():
@@ -112,7 +115,7 @@ def wechat_auth():
             if match[0] == 0:
                 # 数据库有完全匹配的记录
                 if len(match[1]) == 1:
-                    restr = match[1][0] + '----' + password
+                    restr = match[1][0] + '----' + gen_password2(match[1][0]+account+fromuser, mode)
                 else:
                     for i in range(len(match[1])):
                         restr += match[1][i] + '\n'
@@ -123,7 +126,7 @@ def wechat_auth():
                     restr += match[1][i] + '\n'
             else:
                 # 首次出现
-                restr = keyword + '----' + password
+                restr = keyword + '----' + gen_password2(keyword+account+fromuser, mode)
                 # update数据库
                 add_keyword(keyword)
 
@@ -156,6 +159,98 @@ def get_access_token():
     response = urllib.request.urlopen(req)
     result = json.loads(response.read())
     return result.get('access_token')
+
+
+def gen_password2(s, mode):
+    digest = hashlib.sha1(s.encode('utf-8')).hexdigest()
+    digest += ' ' + digest[1:] + digest[0]
+    password = ''
+    print(digest)
+    special_symbol_list = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '+', '~']
+    length = mode // 100
+    if mode % 10 == 1:
+        # 纯数字
+        repeat = False
+        for i in range(0, 80, 2):
+            print(digest[i:i + 2])
+            number = str(int(digest[i:i + 2], 16) % 10)
+            if len(password) == length:
+                break
+            if repeat and number in password:
+                continue
+            if number in password:
+                repeat = True
+            password += str(int(digest[i:i + 2], 16) % 10)
+    elif mode % 10 == 2:
+        # 数字+小写字母
+        lowercase_number = length // 2
+        digit_number = length - lowercase_number
+        digit_repeat = False
+        lowercase_repeat = False
+        c = 0
+        for i in range(0, 80, 2):
+            digit = str(int(digest[i:i + 2], 16) % 10)
+            if len(password) == digit_number:
+                c = i + 2
+                break
+            if digit_repeat and digit in password:
+                continue
+            if digit in password:
+                digit_repeat = True
+            password += digit
+        for i in range(c, 80, 2):
+            lowercase = string.ascii_lowercase[(int(digest[i:i + 2], 16) % 26)]
+            if len(password) == length:
+                break
+            if lowercase_repeat and lowercase in password:
+                continue
+            if lowercase in password:
+                lowercase_repeat = True
+            password += lowercase
+    elif mode % 10 == 3:
+        digit_number = 3 + (length - 3) // 4
+        lowercase_number = 2 + (length - 4) // 4
+        uppercase_number = 1 + (length - 5) // 4
+        c = 0
+        for i in range(0, digit_number * 2, 2):
+            digit = str(int(digest[i:i + 2], 16) % 10)
+            password += digit
+            c = i + 2
+        for i in range(c, c + lowercase_number * 2, 2):
+            lowercase = string.ascii_lowercase[(int(digest[i:i + 2], 16) % 26)]
+            password += lowercase
+            c = i + 2
+        for i in range(c, c + uppercase_number * 2, 2):
+            uppercase = string.ascii_uppercase[(int(digest[i:i + 2], 16) % 26)]
+            password += uppercase
+
+    elif mode % 10 == 4:
+        # 数字+字母+特殊符号
+        digit_number = 2 + (length - 3) // 4
+        lowercase_number = 2 + (length - 4) // 4
+        uppercase_number = 1 + (length - 5) // 4
+        special_symbol_number = 1 + (length - 6) // 4
+        c = 0
+        for i in range(0, digit_number * 2, 2):
+            digit = str(int(digest[i:i + 2], 16) % 10)
+            password += digit
+            c = i + 2
+        for i in range(c, c + lowercase_number * 2, 2):
+            lowercase = string.ascii_lowercase[(int(digest[i:i + 2], 16) % 26)]
+            password += lowercase
+            c = i + 2
+        for i in range(c, c + uppercase_number * 2, 2):
+            uppercase = string.ascii_uppercase[(int(digest[i:i + 2], 16) % 26)]
+            password += uppercase
+            c = i + 2
+        for i in range(c, c + special_symbol_number * 2, 2):
+            special_symbol_number = special_symbol_list[(int(digest[i:i + 2], 16) % 13)]
+            password += special_symbol_number
+    permutation_list = []
+    gen_permutation(password, '', permutation_list)
+    residual = sum([ord(i) for i in digest]) % math.factorial(length)
+
+    return permutation_list[residual]
 
 
 def gen_password(str, openid):
