@@ -80,6 +80,7 @@ def wechat_auth():
             response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), password))
             response.content_type = 'application/xml'
             return response
+
         else:
             content_splited = content.split(' ')
             keyword = content_splited[0]
