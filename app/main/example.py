@@ -81,6 +81,8 @@ def wechat_auth():
             response.content_type = 'application/xml'
             return response
 
+
+
         else:
             content_splited = content.split(' ')
             keyword = content_splited[0]
