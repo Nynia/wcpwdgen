@@ -49,7 +49,7 @@ def wechat_auth():
         content = xml_rec.find('Content').text.strip()
         print([touser, fromuser, content])
 
-        password = gen_password(hashlib.sha1((content + touser).encode('utf-8')).hexdigest(), sumof(fromuser))
+        #password = gen_password(hashlib.sha1((content + touser).encode('utf-8')).hexdigest(), sumof(fromuser))
         xml_rep = '''<xml>
                     <ToUserName><![CDATA[%s]]></ToUserName>
                     <FromUserName><![CDATA[%s]]></FromUserName>
@@ -71,6 +71,13 @@ def wechat_auth():
                 add_new_user(fromuser, email)
             restr = "email设置成功"
             response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
+            response.content_type = 'application/xml'
+            return response
+        elif content.startswith("old"):
+            content_splited = content.split(' ')
+            content = content_splited[1]
+            password = gen_password(hashlib.sha1((content + touser).encode('utf-8')).hexdigest(), sumof(fromuser))
+            response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), password))
             response.content_type = 'application/xml'
             return response
         else:
@@ -137,14 +144,6 @@ def wechat_auth():
             response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
             response.content_type = 'application/xml'
             return response
-
-        # print(sumof(fromuser + touser))
-
-        # print(password)
-        #
-        # response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), password))
-        # response.content_type = 'application/xml'
-        # return response
 
 
 def get_access_token():
