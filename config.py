@@ -23,7 +23,7 @@ class TestingConfig(Config):
 
 
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'mysql://root:admin@35.246.68.36/wxpwdgen'
+    SQLALCHEMY_DATABASE_URI = 'mysql://root:admin@35.246.68.36/weixinpwd'
 
 
 config = {

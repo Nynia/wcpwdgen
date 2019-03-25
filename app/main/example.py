@@ -48,8 +48,6 @@ def wechat_auth():
         fromuser = xml_rec.find('FromUserName').text
         content = xml_rec.find('Content').text.strip()
         print([touser, fromuser, content])
-
-        #password = gen_password(hashlib.sha1((content + touser).encode('utf-8')).hexdigest(), sumof(fromuser))
         xml_rep = '''<xml>
                     <ToUserName><![CDATA[%s]]></ToUserName>
                     <FromUserName><![CDATA[%s]]></FromUserName>
@@ -64,12 +62,19 @@ def wechat_auth():
             pass
         elif content == 'list':
             pass
-        elif content.startswith('set email'):
+        elif content.startswith('init'):
             content_splited = content.split(' ')
             if len(content_splited) > 2:
-                email = content_splited[2]
+                email = content_splited[1]
+                mode = content_splited[2]
+                add_new_user(fromuser, email, mode)
+                restr = "设置成功"
+            elif len(content_splited) > 1:
+                email = content_splited[1]
                 add_new_user(fromuser, email)
-            restr = "email设置成功"
+                restr = "设置成功"
+            else:
+                restr = "参数错误"
             response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
             response.content_type = 'application/xml'
             return response
@@ -80,9 +85,6 @@ def wechat_auth():
             response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), password))
             response.content_type = 'application/xml'
             return response
-
-
-
         else:
             content_splited = content.split(' ')
             keyword = content_splited[0]
@@ -103,19 +105,28 @@ def wechat_auth():
                 keyword = keyword[7:]
             print([keyword, account, mode])
 
+            items = get_rel(fromuser, keyword)
             if not account:
-                item = get_user_by_openid(fromuser)
-                if not item:
-                    restr = "请先初始化默认账户 set email xxx@xxx.xx"
-                    response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
-                    response.content_type = 'application/xml'
-                    return response
+                if len(items) > 1:
+                    restr = "存在多个账号，请具体指定:"
+                    for item in items:
+                        restr += "\n%s" % item.account
+                elif len(items) == 1:
+                    account = items[0].account
                 else:
-                    account = item.email1
-            if not mode:
-                item = get_rel(fromuser, keyword, account)
-                if item:
-                    mode = item.mode
+                    item = get_user_by_openid(fromuser)
+                    if not item:
+                        restr = "请先初始化默认账户 init XXX@mail.com"
+                        response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
+                        response.content_type = 'application/xml'
+                        return response
+                    else:
+                        account = item.email
+            if not mode :
+                if len(items) > 1:
+                    pass
+                elif len(items) == 1:
+                    pass
                 else:
                     mode = 604
 
@@ -136,7 +147,7 @@ def wechat_auth():
                     restr += match[1][i] + '\n'
             else:
                 # 首次出现
-                restr = keyword + '----' + gen_password2(keyword+account+fromuser, int(mode))
+                restr = keyword + '---' + account + '---' + gen_password2(keyword+account+fromuser, int(mode))
                 # update数据库
                 add_keyword(keyword)
 

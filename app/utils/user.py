@@ -8,14 +8,16 @@ def get_user_by_openid(openid):
     return item
 
 
-def add_new_user(openid, email):
+def add_new_user(openid, email, mode=604):
     item = User.query.get(openid)
     if item:
-        item.email1 = email
+        item.email = email
+        item.mode = mode
     else:
         item = User()
         item.openid = openid
-        item.email1 = email
+        item.email = email
+        item.mode = mode
         item.createtime = datetime.datetime.now()
     item.modifytime = datetime.datetime.now()
 

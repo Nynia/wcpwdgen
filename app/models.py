@@ -4,18 +4,16 @@ from app import db
 class User(db.Model):
     __tablename__ = 'user'
     openid = db.Column(db.VARCHAR(50), primary_key=True)
-    email1 = db.Column(db.VARCHAR(50))
-    email2 = db.Column(db.VARCHAR(50))
-    email3 = db.Column(db.VARCHAR(50))
+    email = db.Column(db.VARCHAR(50))
+    mode = db.Column(db.SMALLINT)
     createtime = db.Column(db.DATETIME)
     modifytime = db.Column(db.DATETIME)
 
     def to_json(self):
         return {
             'openid': self.openid,
-            'email1': self.email1,
-            'email2': self.email2,
-            'email3': self.email3,
+            'email': self.email,
+            'mode': self.mode,
             'createtime': self.createtime,
             'modifytime': self.modifytime
         }

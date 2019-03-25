@@ -8,10 +8,9 @@ def get_rel_by_openid(openid):
     return items
 
 
-def get_rel(openid, keyword, account):
-    item = Master.query.filter_by(openid=openid).filter_by(keyword=keyword). \
-        filter_by(account=account).first()
-    return item
+def get_rel(openid, keyword):
+    items = Master.query.filter_by(openid=openid).filter_by(keyword=keyword).all()
+    return items
 
 
 def update_rel(openid, keyword, account, mode):
