@@ -68,15 +68,14 @@ def wechat_auth():
                         <FromUserName><![CDATA[%s]]></FromUserName>
                         <CreateTime>%s</CreateTime>
                         <MsgType><![CDATA[image]]></MsgType>
-                        <PicUrl><![CDATA[%s]]></PicUrl>
-                        <MediaId><![CDATA[%s]]></MediaId>
+                        <Image>
+                            <MediaId><![CDATA[media_id]]></MediaId>
+                        </Image>
                         </xml>
                         '''
-            pic_url = 'http://mmbiz.qpic.cn/mmbiz_jpg/0QKzjE0S92DSf4oNeZy42ib2aGPnuqXq' \
-                      'mXKwU1TVLCzt5eLyVlVmj14kkUUzAU1F4nwcRgrJmNIVHVO9u6ZTGibg/0?wx_fmt=jpeg'
             media_id = 'ck87880KC8H90pszDj6Xoz7uFjGFX0KCOTNP4aAIWNs'
             print(xml_rep)
-            response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), pic_url, media_id))
+            response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), media_id))
             response.content_type = 'application/xml'
             return response
         elif content == 'list':
