@@ -3,14 +3,19 @@ import datetime
 from app import db
 
 
-def get_rel_by_openid(openid):
+def get_rels_by_openid(openid):
     items = Master.query.filter_by(openid=openid).all()
     return items
 
 
-def get_rel(openid, keyword):
+def get_rels_by_keyword(openid, keyword):
     items = Master.query.filter_by(openid=openid).filter_by(keyword=keyword).all()
     return items
+
+
+def get_rel_by_keyword_and_account(openid, keyword, account):
+    item = Master.query.filter_by(openid=openid).filter_by(keyword=keyword).filter_by(account=account).first()
+    return item
 
 
 def update_rel(openid, keyword, account, mode):

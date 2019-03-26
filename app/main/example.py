@@ -8,7 +8,7 @@ import urllib.parse
 from config import TOKEN
 import json
 from app.utils.keyword import get_all_keywords, add_keyword
-from app.utils.master import update_rel, get_rel
+from app.utils.master import update_rel, get_rel_by_keyword_and_account,get_rels_by_keyword
 from app.utils.user import *
 import string
 import math
@@ -105,30 +105,44 @@ def wechat_auth():
                 keyword = keyword[7:]
             print([keyword, account, mode])
 
-            items = get_rel(fromuser, keyword)
-            if not account:
-                if len(items) > 1:
-                    restr = "存在多个账号，请具体指定:"
-                    for item in items:
-                        restr += "\n%s" % item.account
-                elif len(items) == 1:
-                    account = items[0].account
-                else:
-                    item = get_user_by_openid(fromuser)
-                    if not item:
+            if account is None:
+                items = get_rels_by_keyword(fromuser, keyword)
+                if len(items) == 0:
+                    user = get_user_by_openid(fromuser)
+                    if not user:
                         restr = "请先初始化默认账户 init XXX@mail.com"
                         response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
                         response.content_type = 'application/xml'
                         return response
                     else:
-                        account = item.email
-            if not mode :
-                if len(items) > 1:
-                    pass
+                        account = user.email
+                        if mode is None:
+                            mode = user.mode
                 elif len(items) == 1:
-                    pass
+                    account = items[0].email
+                    if mode is None:
+                        mode = items[0].mode
                 else:
-                    mode = 604
+                    restr = "存在多个账号，请具体指定:"
+                    for item in items:
+                        restr += "\n%s" % item.account
+                    response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
+                    response.content_type = 'application/xml'
+                    return response
+            else:
+                item = get_rel_by_keyword_and_account(fromuser, keyword, account)
+                if item is None:
+                    user = get_user_by_openid(fromuser)
+                    if not user:
+                        restr = "请先初始化默认账户 init XXX@mail.com"
+                        response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
+                        response.content_type = 'application/xml'
+                        return response
+                    else:
+                        mode = user.mode
+                else:
+                    if mode is None:
+                        mode = item.mode
 
             keywords = get_all_keywords()
             match = search_best_match(keywords, keyword)
