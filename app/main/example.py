@@ -10,6 +10,7 @@ import json
 from app.utils.keyword import get_all_keywords, add_keyword
 from app.utils.master import update_rel, get_rel_by_keyword_and_account, get_rels_by_keyword
 from app.utils.user import *
+from app.utils.record import add_new_record
 import string
 import math
 
@@ -57,12 +58,14 @@ def wechat_auth():
                     <FuncFlag>0</FuncFlag>
                     </xml>
                 '''
+        # record
+        add_new_record(fromuser, content)
+
         restr = ''
         if content == 'help':
             pass
         elif content == 'list':
             pass
-
         elif content.startswith('add'):
             content_splited = content.split(' ')
             label1 = None
