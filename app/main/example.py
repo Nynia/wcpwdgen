@@ -66,7 +66,7 @@ def wechat_auth():
                 response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), media_id))
                 response.content_type = 'application/xml'
                 return response
-        elif msgtype == 'content':
+        elif msgtype == 'text':
             content = xml_rec.find('Content').text.strip()
             print([touser, fromuser, content])
             xml_rep = '''<xml>
