@@ -73,8 +73,9 @@ def wechat_auth():
                         <MsgId>123456789012345</MsgId>
                         </xml>
                         '''
-            pic_url = ''
+            pic_url = 'https://raw.githubusercontent.com/Nynia/imgbed/master/20190326121722.jpg'
             media_id = 'YSOXKUi_VOb9xbS4Hh9fPjh6VEuPJojIMsqcUuBc1Id3sJvKLxjYXAqni4WQz1Hs'
+            print(xml_rec)
             response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), pic_url, media_id))
             response.content_type = 'application/xml'
             return response
