@@ -8,14 +8,19 @@ def get_all_keywords():
     return items
 
 
-def add_keyword(keyword):
+def add_keyword(keyword, label1, label2):
     item = Keyword.query.filter_by(keyword=keyword).first()
 
     if item:
-        return False
+        if label1 is not None:
+            item.label1 = label1
+        if label2 is not None:
+            item.label2 = label2
     else:
         item = Keyword()
         item.keyword = keyword
+        item.label1 = label1
+        item.label2 = label2
         item.createtime = datetime.datetime.now()
         item.modifytime = item.createtime
 

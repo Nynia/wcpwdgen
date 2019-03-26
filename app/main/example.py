@@ -8,7 +8,7 @@ import urllib.parse
 from config import TOKEN
 import json
 from app.utils.keyword import get_all_keywords, add_keyword
-from app.utils.master import update_rel, get_rel_by_keyword_and_account,get_rels_by_keyword
+from app.utils.master import update_rel, get_rel_by_keyword_and_account, get_rels_by_keyword
 from app.utils.user import *
 import string
 import math
@@ -62,6 +62,23 @@ def wechat_auth():
             pass
         elif content == 'list':
             pass
+        elif content == 'add':
+            content_splited = content.split(' ')
+            label1 = None
+            label2 = None
+            if len(content_splited) < 2:
+                restr = "参数错误"
+            else:
+                keyword = content_splited[1]
+                if len(content_splited) > 2:
+                    label1 = content_splited[2]
+                if len(content_splited) > 3:
+                    label2 = content_splited[3]
+                add_keyword(keyword, label1, label2)
+                restr = "成功"
+            response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
+            response.content_type = 'application/xml'
+            return response
         elif content.startswith('set'):
             content_splited = content.split(' ')
             if len(content_splited) > 2:
@@ -155,10 +172,12 @@ def wechat_auth():
             if match[0] == 0:
                 # 数据库有完全匹配的记录
                 if len(match[1]) == 1:
-                    restr = match[1][0] + '\n' + account + '\n' + gen_password2(match[1][0]+account+fromuser, int(mode))
+                    restr = match[1][0] + '\n' + account + '\n' + gen_password2(match[1][0] + account + fromuser,
+                                                                                int(mode))
                 else:
                     for i in range(len(match[1])):
                         restr += match[1][i] + '\n'
+                update_rel(fromuser, keyword, account, mode)
 
             elif match[0] == 1:
                 # 数据库有不完全匹配的记录
@@ -167,13 +186,14 @@ def wechat_auth():
                     restr += match[1][i] + '\n'
             else:
                 # 首次出现
-                restr = keyword + '\n' + account + '\n' + gen_password2(keyword+account+fromuser, int(mode))
+                restr = keyword + '\n' + account + '\n' + gen_password2(keyword + account + fromuser, int(mode))
                 # update数据库
                 add_keyword(keyword)
+                update_rel(fromuser, keyword, account, mode)
 
             # update rel
-            update_rel(fromuser, keyword, account, mode)
-            #update_user(fromuser, account)
+            # update_rel(fromuser, keyword, account, mode)
+            # update_user(fromuser, account)
 
             response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
             response.content_type = 'application/xml'
