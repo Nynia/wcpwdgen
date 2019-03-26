@@ -191,7 +191,6 @@ def wechat_auth():
                 add_keyword(keyword, None, None)
                 update_rel(fromuser, keyword, account, mode)
 
-            # update rel
             # update_rel(fromuser, keyword, account, mode)
             # update_user(fromuser, account)
 
