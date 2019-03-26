@@ -62,7 +62,7 @@ def wechat_auth():
             pass
         elif content == 'list':
             pass
-        elif content.startswith('init'):
+        elif content.startswith('set'):
             content_splited = content.split(' ')
             if len(content_splited) > 2:
                 email = content_splited[1]
@@ -70,8 +70,13 @@ def wechat_auth():
                 add_new_user(fromuser, email, mode)
                 restr = "设置成功"
             elif len(content_splited) > 1:
-                email = content_splited[1]
-                add_new_user(fromuser, email)
+                if content_splited[1].isnumeric():
+                    mode = content_splited[1]
+                    email = None
+                else:
+                    email = content_splited[1]
+                    mode = None
+                add_new_user(fromuser, email, mode)
                 restr = "设置成功"
             else:
                 restr = "参数错误"
@@ -167,7 +172,7 @@ def wechat_auth():
 
             # update rel
             update_rel(fromuser, keyword, account, mode)
-            update_user(fromuser, account)
+            #update_user(fromuser, account)
 
             response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
             response.content_type = 'application/xml'
