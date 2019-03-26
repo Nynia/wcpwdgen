@@ -188,7 +188,7 @@ def wechat_auth():
                 # 首次出现
                 restr = keyword + '\n' + account + '\n' + gen_password2(keyword + account + fromuser, int(mode))
                 # update数据库
-                add_keyword(keyword)
+                add_keyword(keyword, None, None)
                 update_rel(fromuser, keyword, account, mode)
 
             # update rel
