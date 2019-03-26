@@ -62,6 +62,7 @@ def wechat_auth():
             pass
         elif content == 'list':
             pass
+
         elif content.startswith('add'):
             content_splited = content.split(' ')
             label1 = None
