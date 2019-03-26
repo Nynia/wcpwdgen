@@ -67,7 +67,7 @@ def wechat_auth():
         elif content == 'list':
             items = get_rels_by_openid(fromuser)
             for item in items:
-                restr += item.keyword + '---' + item.account + '\n'
+                restr += item.keyword + '\n' + item.account + '\n---------------------\n'
             response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
             response.content_type = 'application/xml'
             return response
