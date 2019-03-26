@@ -63,7 +63,21 @@ def wechat_auth():
 
         restr = ''
         if content == 'help':
-            pass
+            xml_rep = '''<xml>
+                        <ToUserName><![CDATA[%s]]></ToUserName>
+                        <FromUserName><![CDATA[%s]]></FromUserName>
+                        <CreateTime>%s</CreateTime>
+                        <MsgType><![CDATA[image]]></MsgType>
+                        <PicUrl><![CDATA[%s]]></PicUrl>
+                        <MediaId><![CDATA[%s]]></MediaId>
+                        <MsgId>123456789012345</MsgId>
+                        </xml>
+                        '''
+            pic_url = ''
+            media_id = 'YSOXKUi_VOb9xbS4Hh9fPjh6VEuPJojIMsqcUuBc1Id3sJvKLxjYXAqni4WQz1Hs'
+            response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), pic_url, media_id))
+            response.content_type = 'application/xml'
+            return response
         elif content == 'list':
             items = get_rels_by_openid(fromuser)
             for item in items:
