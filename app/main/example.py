@@ -48,7 +48,10 @@ def wechat_auth():
         touser = xml_rec.find('ToUserName').text
         fromuser = xml_rec.find('FromUserName').text
         content = xml_rec.find('Content').text.strip()
-        print([touser, fromuser, content])
+        event = xml_rec.find('Event').text
+        print([touser, fromuser, content, event])
+        if event == 'subscribe':
+            content = 'help'
         xml_rep = '''<xml>
                     <ToUserName><![CDATA[%s]]></ToUserName>
                     <FromUserName><![CDATA[%s]]></FromUserName>
@@ -74,7 +77,6 @@ def wechat_auth():
                         </xml>
                         '''
             media_id = 'ck87880KC8H90pszDj6Xoz7uFjGFX0KCOTNP4aAIWNs'
-            print(xml_rep)
             response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), media_id))
             response.content_type = 'application/xml'
             return response
