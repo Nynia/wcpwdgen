@@ -69,7 +69,7 @@ def wechat_auth():
                         <CreateTime>%s</CreateTime>
                         <MsgType><![CDATA[image]]></MsgType>
                         <Image>
-                            <MediaId><![CDATA[media_id]]></MediaId>
+                            <MediaId><![CDATA[%s]]></MediaId>
                         </Image>
                         </xml>
                         '''
