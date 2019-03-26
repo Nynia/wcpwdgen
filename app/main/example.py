@@ -124,7 +124,7 @@ def wechat_auth():
                         if mode is None:
                             mode = user.mode
                 elif len(items) == 1:
-                    account = items[0].email
+                    account = items[0].account
                     if mode is None:
                         mode = items[0].mode
                 else:
