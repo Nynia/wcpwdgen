@@ -8,7 +8,7 @@ import urllib.parse
 from config import TOKEN
 import json
 from app.utils.keyword import get_all_keywords, add_keyword
-from app.utils.master import update_rel, get_rel_by_keyword_and_account, get_rels_by_keyword
+from app.utils.master import update_rel, get_rel_by_keyword_and_account, get_rels_by_keyword, get_rels_by_openid
 from app.utils.user import *
 from app.utils.record import add_new_record
 import string
@@ -65,7 +65,12 @@ def wechat_auth():
         if content == 'help':
             pass
         elif content == 'list':
-            pass
+            items = get_rels_by_openid(fromuser)
+            for item in items:
+                restr += item.keyword + '---' + item.account + '\n'
+            response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
+            response.content_type = 'application/xml'
+            return response
         elif content.startswith('add'):
             content_splited = content.split(' ')
             label1 = None
@@ -194,9 +199,6 @@ def wechat_auth():
                 # update数据库
                 add_keyword(keyword, None, None)
                 update_rel(fromuser, keyword, account, mode)
-
-            # update_rel(fromuser, keyword, account, mode)
-            # update_user(fromuser, account)
 
             response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
             response.content_type = 'application/xml'
