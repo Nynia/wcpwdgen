@@ -73,8 +73,8 @@ def wechat_auth():
                         <MsgId>123456789012345</MsgId>
                         </xml>
                         '''
-            pic_url = 'https://raw.githubusercontent.com/Nynia/imgbed/master/20190326121722.jpg'
-            media_id = 'YSOXKUi_VOb9xbS4Hh9fPjh6VEuPJojIMsqcUuBc1Id3sJvKLxjYXAqni4WQz1Hs'
+            pic_url = 'http://mmbiz.qpic.cn/mmbiz_jpg/0QKzjE0S92DSf4oNeZy42ib2aGPnuqXqmXKwU1TVLCzt5eLyVlVmj14kkUUzAU1F4nwcRgrJmNIVHVO9u6ZTGibg/0?wx_fmt=jpeg'
+            media_id = 'ck87880KC8H90pszDj6Xoz7uFjGFX0KCOTNP4aAIWNs'
             print(xml_rec)
             response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), pic_url, media_id))
             response.content_type = 'application/xml'
