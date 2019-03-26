@@ -47,178 +47,195 @@ def wechat_auth():
 
         touser = xml_rec.find('ToUserName').text
         fromuser = xml_rec.find('FromUserName').text
-        content = xml_rec.find('Content').text.strip()
-        event = xml_rec.find('Event').text
-        print([touser, fromuser, content, event])
-        if event == 'subscribe':
-            content = 'help'
-        xml_rep = '''<xml>
-                    <ToUserName><![CDATA[%s]]></ToUserName>
-                    <FromUserName><![CDATA[%s]]></FromUserName>
-                    <CreateTime>%s</CreateTime>
-                    <MsgType><![CDATA[text]]></MsgType>
-                    <Content><![CDATA[%s]]></Content>
-                    <FuncFlag>0</FuncFlag>
-                    </xml>
-                '''
-        # record
-        add_new_record(fromuser, content)
-
-        restr = ''
-        if content == 'help':
+        msgtype = xml_rec.find('MsgType').text
+        if msgtype == 'event':
+            event = xml_rec.find('Event').text
+            if event == 'subscribe':
+                print([touser, fromuser, event])
+                xml_rep = '''<xml>
+                                        <ToUserName><![CDATA[%s]]></ToUserName>
+                                        <FromUserName><![CDATA[%s]]></FromUserName>
+                                        <CreateTime>%s</CreateTime>
+                                        <MsgType><![CDATA[image]]></MsgType>
+                                        <Image>
+                                            <MediaId><![CDATA[%s]]></MediaId>
+                                        </Image>
+                                        </xml>
+                                        '''
+                media_id = 'ck87880KC8H90pszDj6Xoz7uFjGFX0KCOTNP4aAIWNs'
+                response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), media_id))
+                response.content_type = 'application/xml'
+                return response
+        elif msgtype == 'content':
+            content = xml_rec.find('Content').text.strip()
+            print([touser, fromuser, content])
             xml_rep = '''<xml>
                         <ToUserName><![CDATA[%s]]></ToUserName>
                         <FromUserName><![CDATA[%s]]></FromUserName>
                         <CreateTime>%s</CreateTime>
-                        <MsgType><![CDATA[image]]></MsgType>
-                        <Image>
-                            <MediaId><![CDATA[%s]]></MediaId>
-                        </Image>
+                        <MsgType><![CDATA[text]]></MsgType>
+                        <Content><![CDATA[%s]]></Content>
+                        <FuncFlag>0</FuncFlag>
                         </xml>
-                        '''
-            media_id = 'ck87880KC8H90pszDj6Xoz7uFjGFX0KCOTNP4aAIWNs'
-            response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), media_id))
-            response.content_type = 'application/xml'
-            return response
-        elif content == 'list':
-            items = get_rels_by_openid(fromuser)
-            for item in items:
-                restr += item.keyword + '\n' + item.account + '\n---------------------\n'
-            response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
-            response.content_type = 'application/xml'
-            return response
-        elif content.startswith('add'):
-            content_splited = content.split(' ')
-            label1 = None
-            label2 = None
-            if len(content_splited) < 2:
-                restr = "参数错误"
-            else:
-                keyword = content_splited[1]
+                    '''
+            # record
+            add_new_record(fromuser, content)
+
+            restr = ''
+            if content == 'help':
+                xml_rep = '''<xml>
+                            <ToUserName><![CDATA[%s]]></ToUserName>
+                            <FromUserName><![CDATA[%s]]></FromUserName>
+                            <CreateTime>%s</CreateTime>
+                            <MsgType><![CDATA[image]]></MsgType>
+                            <Image>
+                                <MediaId><![CDATA[%s]]></MediaId>
+                            </Image>
+                            </xml>
+                            '''
+                media_id = 'ck87880KC8H90pszDj6Xoz7uFjGFX0KCOTNP4aAIWNs'
+                response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), media_id))
+                response.content_type = 'application/xml'
+                return response
+            elif content == 'list':
+                items = get_rels_by_openid(fromuser)
+                for item in items:
+                    restr += item.keyword + '\n' + item.account + '\n---------------------\n'
+                response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
+                response.content_type = 'application/xml'
+                return response
+            elif content.startswith('add'):
+                content_splited = content.split(' ')
+                label1 = None
+                label2 = None
+                if len(content_splited) < 2:
+                    restr = "参数错误"
+                else:
+                    keyword = content_splited[1]
+                    if len(content_splited) > 2:
+                        label1 = content_splited[2]
+                    if len(content_splited) > 3:
+                        label2 = content_splited[3]
+                    add_keyword(keyword, label1, label2)
+                    restr = "成功"
+                response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
+                response.content_type = 'application/xml'
+                return response
+            elif content.startswith('set'):
+                content_splited = content.split(' ')
                 if len(content_splited) > 2:
-                    label1 = content_splited[2]
-                if len(content_splited) > 3:
-                    label2 = content_splited[3]
-                add_keyword(keyword, label1, label2)
-                restr = "成功"
-            response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
-            response.content_type = 'application/xml'
-            return response
-        elif content.startswith('set'):
-            content_splited = content.split(' ')
-            if len(content_splited) > 2:
-                email = content_splited[1]
-                mode = content_splited[2]
-                add_new_user(fromuser, email, mode)
-                restr = "设置成功"
-            elif len(content_splited) > 1:
-                if content_splited[1].isnumeric():
-                    mode = content_splited[1]
-                    email = None
-                else:
                     email = content_splited[1]
-                    mode = None
-                add_new_user(fromuser, email, mode)
-                restr = "设置成功"
-            else:
-                restr = "参数错误"
-            response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
-            response.content_type = 'application/xml'
-            return response
-        elif content.startswith("old"):
-            content_splited = content.split(' ')
-            content = content_splited[1]
-            password = gen_password(hashlib.sha1((content + touser).encode('utf-8')).hexdigest(), sumof(fromuser))
-            response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), password))
-            response.content_type = 'application/xml'
-            return response
-        else:
-            content_splited = content.split(' ')
-            keyword = content_splited[0]
-            if len(content_splited) > 2:
-                account = content_splited[1]
-                mode = content_splited[2]
-            elif len(content_splited) > 1:
-                if content_splited[1].isnumeric():
-                    mode = content_splited[1]
-                    account = None
+                    mode = content_splited[2]
+                    add_new_user(fromuser, email, mode)
+                    restr = "设置成功"
+                elif len(content_splited) > 1:
+                    if content_splited[1].isnumeric():
+                        mode = content_splited[1]
+                        email = None
+                    else:
+                        email = content_splited[1]
+                        mode = None
+                    add_new_user(fromuser, email, mode)
+                    restr = "设置成功"
                 else:
+                    restr = "参数错误"
+                response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
+                response.content_type = 'application/xml'
+                return response
+            elif content.startswith("old"):
+                content_splited = content.split(' ')
+                content = content_splited[1]
+                password = gen_password(hashlib.sha1((content + touser).encode('utf-8')).hexdigest(), sumof(fromuser))
+                response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), password))
+                response.content_type = 'application/xml'
+                return response
+            else:
+                content_splited = content.split(' ')
+                keyword = content_splited[0]
+                if len(content_splited) > 2:
                     account = content_splited[1]
+                    mode = content_splited[2]
+                elif len(content_splited) > 1:
+                    if content_splited[1].isnumeric():
+                        mode = content_splited[1]
+                        account = None
+                    else:
+                        account = content_splited[1]
+                        mode = None
+                else:
+                    account = None
                     mode = None
-            else:
-                account = None
-                mode = None
-            if keyword.startswith('http://'):
-                keyword = keyword[7:]
-            print([keyword, account, mode])
+                if keyword.startswith('http://'):
+                    keyword = keyword[7:]
+                print([keyword, account, mode])
 
-            if account is None:
-                items = get_rels_by_keyword(fromuser, keyword)
-                if len(items) == 0:
-                    user = get_user_by_openid(fromuser)
-                    if not user:
-                        restr = "请先初始化默认账户 init XXX@mail.com"
-                        response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
-                        response.content_type = 'application/xml'
-                        return response
-                    else:
-                        account = user.email
+                if account is None:
+                    items = get_rels_by_keyword(fromuser, keyword)
+                    if len(items) == 0:
+                        user = get_user_by_openid(fromuser)
+                        if not user:
+                            restr = "请先初始化默认账户 init XXX@mail.com"
+                            response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
+                            response.content_type = 'application/xml'
+                            return response
+                        else:
+                            account = user.email
+                            if mode is None:
+                                mode = user.mode
+                    elif len(items) == 1:
+                        account = items[0].account
                         if mode is None:
-                            mode = user.mode
-                elif len(items) == 1:
-                    account = items[0].account
-                    if mode is None:
-                        mode = items[0].mode
-                else:
-                    restr = "存在多个账号，请具体指定:"
-                    for item in items:
-                        restr += "\n%s" % item.account
-                    response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
-                    response.content_type = 'application/xml'
-                    return response
-            else:
-                item = get_rel_by_keyword_and_account(fromuser, keyword, account)
-                if item is None:
-                    user = get_user_by_openid(fromuser)
-                    if not user:
-                        restr = "请先初始化默认账户 init XXX@mail.com"
+                            mode = items[0].mode
+                    else:
+                        restr = "存在多个账号，请具体指定:"
+                        for item in items:
+                            restr += "\n%s" % item.account
                         response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
                         response.content_type = 'application/xml'
                         return response
+                else:
+                    item = get_rel_by_keyword_and_account(fromuser, keyword, account)
+                    if item is None:
+                        user = get_user_by_openid(fromuser)
+                        if not user:
+                            restr = "请先初始化默认账户 init XXX@mail.com"
+                            response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
+                            response.content_type = 'application/xml'
+                            return response
+                        else:
+                            mode = user.mode
                     else:
-                        mode = user.mode
-                else:
-                    if mode is None:
-                        mode = item.mode
+                        if mode is None:
+                            mode = item.mode
 
-            keywords = get_all_keywords()
-            match = search_best_match(keywords, keyword)
-            print(match)
-            if match[0] == 0:
-                # 数据库有完全匹配的记录
-                if len(match[1]) == 1:
-                    restr = match[1][0] + '\n' + account + '\n' + gen_password2(match[1][0] + account + fromuser,
-                                                                                int(mode))
-                else:
+                keywords = get_all_keywords()
+                match = search_best_match(keywords, keyword)
+                print(match)
+                if match[0] == 0:
+                    # 数据库有完全匹配的记录
+                    if len(match[1]) == 1:
+                        restr = match[1][0] + '\n' + account + '\n' + gen_password2(match[1][0] + account + fromuser,
+                                                                                    int(mode))
+                    else:
+                        for i in range(len(match[1])):
+                            restr += match[1][i] + '\n'
+                    update_rel(fromuser, keyword, account, mode)
+
+                elif match[0] == 1:
+                    # 数据库有不完全匹配的记录
+                    restr = "Do you mean?\n"
                     for i in range(len(match[1])):
                         restr += match[1][i] + '\n'
-                update_rel(fromuser, keyword, account, mode)
+                else:
+                    # 首次出现
+                    restr = keyword + '\n' + account + '\n' + gen_password2(keyword + account + fromuser, int(mode))
+                    # update数据库
+                    add_keyword(keyword, None, None)
+                    update_rel(fromuser, keyword, account, mode)
 
-            elif match[0] == 1:
-                # 数据库有不完全匹配的记录
-                restr = "Do you mean?\n"
-                for i in range(len(match[1])):
-                    restr += match[1][i] + '\n'
-            else:
-                # 首次出现
-                restr = keyword + '\n' + account + '\n' + gen_password2(keyword + account + fromuser, int(mode))
-                # update数据库
-                add_keyword(keyword, None, None)
-                update_rel(fromuser, keyword, account, mode)
-
-            response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
-            response.content_type = 'application/xml'
-            return response
+                response = make_response(xml_rep % (fromuser, touser, str(int(time.time())), restr))
+                response.content_type = 'application/xml'
+                return response
 
 
 def get_access_token():
