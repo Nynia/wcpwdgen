@@ -5,7 +5,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 # weixin
 TOKEN = 'CCLOVE'
 APPID = 'wx0c3b0b616cc6e6f7'
-APPSECRET = '0333eabbe733dd2c86c6532893271137'
+APPSECRET = '7ca986e41bd99f50547e302a485d4643'
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'skks'
@@ -19,7 +19,7 @@ class Config:
 
 class TestingConfig(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'mysql://root:admin@127.0.0.1/wc_pwd'
+    SQLALCHEMY_DATABASE_URI = 'mysql://root:admin@127.0.0.1/weixinpwd'
 
 
 class ProductionConfig(Config):
@@ -29,5 +29,5 @@ class ProductionConfig(Config):
 config = {
     'testing': TestingConfig,
     'production': ProductionConfig,
-    'default': ProductionConfig
+    'default': TestingConfig
 }
