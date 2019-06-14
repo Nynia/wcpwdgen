@@ -19,7 +19,7 @@ class Config:
 
 class TestingConfig(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'mysql://root:admin@127.0.0.1/weixinpwd'
+    SQLALCHEMY_DATABASE_URI = 'mysql://ubuntu:ubuntu123@127.0.0.1/weixinpwd'
 
 
 class ProductionConfig(Config):
