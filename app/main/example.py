@@ -37,7 +37,7 @@ def wechat_auth():
         print(payload)
         payload.sort()
         payload = ''.join(payload)
-        hashlib.sha1(payload).hexdigest()
+        #hashlib.sha1(payload).hexdigest()
 
         if hashlib.sha1(payload.encode('utf-8')).hexdigest() == signature:
             return make_response(echostr)
